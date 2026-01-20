@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/24726097/README.md)
 
 # Containerize a RAG API with Docker
 
