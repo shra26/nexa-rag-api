@@ -7,7 +7,7 @@ import ollama
 app = FastAPI()
 chroma = chromadb.PersistentClient(path="./db")
 collection = chroma.get_or_create_collection("docs")
-ollama_client = ollama.Client(host="http://host.docker.internal:11434")
+# ollama_client = ollama.Client(host="http://host.docker.internal:11434")
 
 @app.post("/query")
 def query(q: str):
