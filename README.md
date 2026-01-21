@@ -4,6 +4,9 @@ By Shravanth Venkatesh
 
 \|January 2026
 
+<img width="1018" height="395" alt="Screenshot 2026-01-20 at 10 09 21 PM" src="https://github.com/user-attachments/assets/4bb14b72-11eb-4015-8695-b21299a517a4" />
+
+
 <img width="1128" height="424" alt="image" src="https://github.com/user-attachments/assets/e0b89689-f3d5-4786-ac16-c5f57b751a5f" />
 
 
