@@ -1,113 +1,131 @@
+# Deploy a RAG API to Kubernetes
 
-# Containerize a RAG API with Docker
+By Shravanth Venkatesh
+
+\|January 2026
+
+<img width="1128" height="424" alt="image" src="https://github.com/user-attachments/assets/e0b89689-f3d5-4786-ac16-c5f57b751a5f" />
 
 
-**Author:** Shravanth Venkatesh  
+# Introducing Today's Project!
 
----
+In this project, I will deploy the RAG API built in the previous exercise to Kubernetes. I'm doing this project to learn quick Kubernetes depoyment. Kubernetes will help me deploy and manage continers in a real production environment.
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_x7y8z9a0)
+## Key services and concepts
 
----
+Key concepts I learnt include kubectl and minikube. Kubernetes provides deployment management service. Deployments manage the replica sets. Services route the endpoint call to the right pod based on tags/ namespaces.
 
-## Introducing Today's Project!
+## Challenges and wins
 
-In this project, I will demonstrate competence in building docker image. I'm doing this project to brush up in commands and docker standards that have changed over the years.
+This project took me approximately 4 hours. The most challenging part was getting comms up between pods and ollama the model provider to work. It was most rewarding to truly understand the capabilities of kubernetes.
 
-### Key services and concepts
+## Why I did this project
 
-Services I used were.. Key concepts I learnt include...
+I did this project because I wanted to learn Kubernetes. One thing I'll apply from this is how to leverage control plane to manage the pods in a large scale.
 
-### Challenges and wins
+# Setting Up My Docker Image
 
-This project took me approximately... The most challenging part was... It was most rewarding to..
+In this step, I'm setting up docker. I need a Docker image because Kubernetes decides where the images run, how many to run and keeps the continers alive but it never builds the image itself.
 
-### Why I did this project
+<img width="1368" height="120" alt="image" src="https://github.com/user-attachments/assets/27373e09-603b-4d56-8813-c65819201c63" />
 
-I did this project because..
 
----
+## What the Docker image contains
 
-## Setting Up the RAG API
+I ran docker images and saw the docker image creaeted. The image size was nexa-rag-app-2:latest. The IMAGE ID was ff77a67a5876.
 
-In this step, I'm setting up the code for the RAG API. The RAG API is an interface to add and query the knowledge base and the locally running model.
+# Installing Kubernetes Tools
 
-### API setup and workspace
+In this step, I'm installing minikube and kubectl. I need these tools because the former runs the k8s cluster and the latter is used to control it.
 
-In this step, I'm creating a virtual environment. A virtual environment is a workspace that allows specific version of package dependencies to exist together without changing unless specified. I need it because i want to package it up into a docker image.
+<img width="1368" height="98" alt="image" src="https://github.com/user-attachments/assets/2c212441-589a-49af-9fe1-f44f3e69ab17" />
 
-### Dependencies installed
 
-The packages I installed are chromadb, fastapi, ollama, uvicorn. FastAPI is used for creating the server endpoints. Chroma is used for storing the knowldge base in the form of numeric sequences called vector embeddings from converting the input text. Uvicorn is used for serving the endpoints. Ollama is used for hosting and running the model locally..
+## Verifying the tools are installed
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_c9d0e1f2)
+I installed Minikube using brew. I installed kubectl by running brew install kubectl. I could tell both installations were successful by running "minikube version" and "kubectl version --client"
 
-### Local API working
+# Starting My Kubernetes Cluster
 
-I tested that my API works by runing a GET call against it. The local API responded with the right data. This confirms that data was ingested by the model from the knowledge base.
+In this step, I'm starting a minikube cluster. Minikube will create the cluster. I also need to load my image onto it for the node to come up.
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_v5w6x7y8)
+<img width="1044" height="96" alt="image" src="https://github.com/user-attachments/assets/4d20ccad-7771-44e8-9dca-f3e40487458e" />
 
----
 
-## Installing Docker Desktop
+## Loading the Docker image into Minikube
 
-### Docker Desktop setup
+I started the cluster by running "minikube start". and saw the minikube control-plane installed using "kubectl get nodes" which also showed the status as ready.
 
-Docker Desktop is a container creator/runner. I installed it because I want to create and run a container. Containerization will help my project by locking in the dependecies and make it usable across any docker application on another sytem.
+## Why load image into Minikube
 
-### Docker verification
+The eval minikube docker-env command sets the terminal's env variables referenced by docker to be set to address the minikube container instead of the host system. Without loading the image into Minikube, Kubernetes would need to get the image from AWS EMR or docker image from docker hub.
 
-I verified Docker is working by installing the hello-world container image from docker. The hello-world container proves that all dependencies for docker as installed and I can proceed in working with docker and access all its functionality.
+# Deploying to Kubernetes
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_i9j0k1l2)
+In this step, I'm deploying my rag api to k8s. I need a Deployment because i want to give control to k8s to run the app and handles scenarios like
+Specifies which container image to run
+Defines how many replicas (copies) to run
+Handles rolling updates (updating without downtime)
+Restarts containers if they crash
+Scales your application up or down
 
----
+<img width="1044" height="860" alt="image" src="https://github.com/user-attachments/assets/099ee680-e5be-4370-95ee-03a49944381d" />
 
-## Creating the Dockerfile
 
-In this step, I'm building a RAG API. RAG stands for Retrival augmented generation. I'm creating files like dockerfile and build the docket image.
+## How the Deployment keeps my app running
 
-### How the Dockerfile works
+The deployment.yaml file tells Kubernetes the desired state if the deployment into the cluster. The key parts are the depoyment name, replicas which denote the number of desired pods, the container image nexa-rag-app-2:latest which we built into the minikube cluster in the previous step and OLLAMA\_HOST which tells the ollama client address in the env variable.
 
-A Dockerfile is the file used to build your image. The key instructions in my Dockerfile are adding the files/dependencies we want run to the image and create the image. FROM tells Docker to choose the base image. COPY is used for choose the files to be added to the image. RUN executes commands as pre compute commands and are added into the image and is ready to go when the image is loaded onto docker. CMD defines the post image start commands to be run when the image is loaded onto docker.
+<img width="1178" height="190" alt="image" src="https://github.com/user-attachments/assets/8916d11d-a06d-43c0-98fb-1b0159f82751" />
 
-### Containerized API test results
 
-Testing the API after containerization proved that we can containerize our api and have it connect to a host ollama. The difference between running locally and in Docker is all dependencies are within the image, works the same everywhere, isolated form host system. Containerization helps because it adds structure, standardization and portability to software
+## What did you observe when checking your pods?
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_o1p2q3r4)
+I ran kubectl get pods and saw my running pod. The pod had the name nexa-rag-app-deployment-66b6f87999-4xmtg. and statu RUNNING. which means the pod is good and working fine. The READY column showed how many replicas are running vs how many are desired in this case 1/1. which indicates there is one 1 pod online and active for 1 desired active, which is perfect for this case.
 
----
+# Creating a Service
 
-## Building and Running the Container
+In this step, I'm creating a k8s service. I need a Service because i need to consistently connect to the api pod which can change it's IP multiple times as they are ephimeral byt using the service the constant IP with DNS names allocated to the pod running the app.
 
-### Docker image build complete
+## What does the service.yaml file do?
 
-Building a Docker image involves making the core files. I verified my Docker image was built successfully by running "docker images | grep name". This confirms that my API is now containerized because there is an image created for it.
+The service.yaml file tells Kubernetes how to provide a stable network endpoint for the RAG API Pods.. The selector finds Pods by matching the meta data tags of the pods. The port configuration allows communication of host system with the pods. NodePort enables access from outside by opening up ports on each node of the cluster, allowing accesss from the outside, in this case the host.
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_p9q0r1s2)
+<img width="1278" height="122" alt="image" src="https://github.com/user-attachments/assets/5b0ea931-5c41-4005-add3-8db481fc76ba" />
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_x7y8z9a0)
 
----
+## What kubectl commands did you run to create the service?
 
-## Pushing to Docker Hub
+I applied my Service file by running "kubectl apply -f service.yml". I then verified that the Service was created by running "kubectl get services".
 
-In this project extension, I'm pushing to Docker Hub. Docker Hub is a cloud repository of images generater by the docker software. I'm doing this because I want to use the image on cloud providers and ci/cd pipeline integration.
+# Accessing My API Through Kubernetes
 
-### Docker Hub push complete
+In this step, I'm testing that my k8s api is accessible from the host system, mimicking a client connection.
 
-I pushed to Docker Hub by connecting to the docker hub with my  login. Docker Hub is useful because it aloows to share built images with the team. The advantage of pushing to a registry is it can be accessed from anywhere in the worls remotly and have it behave the same way constantly, therefore giveing it critical reliability.
+<img width="1128" height="424" alt="image" src="https://github.com/user-attachments/assets/120c1beb-40d0-4d5e-8875-2933061e47fc" />
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_m5n6o7p8)
 
-### Pulling from Docker Hub
+## How I accessed my API
 
-Pulling an image from Docker Hub means i am downloading the image. When I ran docker pull, Docker downloaded the image from the docket hub cloud. The difference between building locally and pulling from Docker Hub is the image build location is different.
+I tested my API by running the fastapi's swagger ui. The response showed data from the knowledge base stored on it. This confirms that the RAG API is working accurately. The main difference between Docker and Kubernetes deployment is that docker is the container and k8s is the container manager which is open source..
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_f5g6h7i8)
+## Request flow through Kubernetes
 
----
+The request flow went from my computer terminal then to nodeport then to k8s service to pod. The Service routed traffic by sending request to 8000 port on the pods by matching with the metadata tag nexa-rag-api. NodePort enabled access by opening/exposing the port 31859.
 
----
+# Testing Self-Healing
+
+In this project extension, I'm demonstrating the insane ability to self heal. Self-healing is important because it adds huge capabilites for the softwares we run on the containers to have very little to no downtime. this is a super power which is needed to gaurantee high SLAs for clients in production environments.
+
+<img width="1290" height="442" alt="image" src="https://github.com/user-attachments/assets/3825e42d-6427-4bec-8ed9-4fd6bdcd9fc1" />
+
+
+## What did you observe when you deleted the pod?
+
+When I deleted the pod, I saw the status change from Terminating, to Pending to ContainerCreating to Running the new pod in less than 1-2 seconds. A new pod was created because the older pod was deleted here, mimicking an actual production service crash or service crash. This is truly a super power compared to standard Auto Scaling Groups which could take upwards of 5-8 mins to bring up a new s AWS EC2 and at lasrge scale orchestration of 1000s of compute pods we can s ee clearly the benefit of using Kubernetes.
+
+<img width="1290" height="1048" alt="image" src="https://github.com/user-attachments/assets/2904d59d-3e86-4b2c-8348-b4acc14d5542" />
+
+## How the Service routed traffic to the new pod
+
+The Service automatically knows about the new pod because it runs a selector on the api tag in the pod metadata and the list in autoupdated in kubernetes. Without Kubernetes this would have led to service disruption. Self-healing is critical in production because it sustains and builds trust in a business by adhering to strict uptime SLAs.
