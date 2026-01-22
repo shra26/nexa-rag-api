@@ -1,5 +1,3 @@
-from multiprocessing import context
-from chromadb.api import collection_configuration
 from fastapi import FastAPI
 import chromadb
 import ollama
@@ -16,7 +14,7 @@ def query(q: str):
 
     answer = ollama.generate(
         model="tinyllama",
-        prompt=f"Context:\n{context}\n\nQuestion: {q}\n\nAnswer clearly and concisely:"
+        prompt=f"Context:\n{context}\n\nQuestion: {q}\n\nAnswer clearly and concisely"
     )
     
     return {"answer": answer["response"]}
