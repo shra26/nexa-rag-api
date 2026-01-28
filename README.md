@@ -1,113 +1,65 @@
+# Automate Testing with GitHub Actions
 
-# Containerize a RAG API with Docker
+By Shravanth Venkatesh
 
+\|January 2026
 
-**Author:** Shravanth Venkatesh  
+# Introducing Today's Project!
 
----
+In this project, I will demonstrate the usage of github actions to setup a Continous Integration/ Continous Depoyment pipeline for our RAG API built over the last few days. I'm doing this project to implement github actions as the mode of CI/CD over aws code build/deploy.
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_x7y8z9a0)
+## Key services and concepts
 
----
+Services I used were github actions, git, test ai responses. Key concepts I learnt include the ability to test ai responses by making sure we check th econtxt we use by mocking the response in a deterministic way.
 
-## Introducing Today's Project!
+## Challenges and wins
 
-In this project, I will demonstrate competence in building docker image. I'm doing this project to brush up in commands and docker standards that have changed over the years.
+This project took me approximately 3 hours. The most challenging part was thinking through the code to get the semantic analysis correctly as i had to look up documentation and understanding it. It was most rewarding to be able ot test the ai deterministically.
 
-### Key services and concepts
+## Why I did this project
 
-Services I used were.. Key concepts I learnt include...
+I did this project because I wanted to learn ci/cd. One thing I'll apply from this is testing patterns in the future.
 
-### Challenges and wins
+# Setting Up Your RAG API
 
-This project took me approximately... The most challenging part was... It was most rewarding to..
+I'm setting up my RAG API by usinf fastAPI. A RAG API retrieves information by adding context using knowledge base. This foundation is needed for CI/CD because we need a codebase to deploy from.
 
-### Why I did this project
+# Creating Semantic Tests
 
-I did this project because..
+I'm creating semantic tests that verify the meaning of the output and whether that is accurate. Unlike unit tests that check code logic, semantic tests validate instead of checking for exact text matches (which would fail due to LLM non-determinism), it checks for the presence of important concepts that should appear in any correct answer about Kubernetes.
 
----
+## Non-deterministic output observation
 
-## Setting Up the RAG API
+When I ran the query multiple times, I noticed the non deterministric nature of the tinyllama model we are using. This is a problem because the answers change and possibly use the context or the trained data information sometimes. For CI/CD to work reliably, we need a semantic analysis of the answer.
 
-In this step, I'm setting up the code for the RAG API. The RAG API is an interface to add and query the knowledge base and the locally running model.
+# Adding Mock LLM Mode
 
-### API setup and workspace
+I'm adding mock LLM mode to test the llm in a deterministic way. This solves the non-determinism problem by outputting the retrieved data instead of generated data. Reliable testing requires deterministic answers.
 
-In this step, I'm creating a virtual environment. A virtual environment is a workspace that allows specific version of package dependencies to exist together without changing unless specified. I need it because i want to package it up into a docker image.
+## Mock LLM mode for CI testing
 
-### Dependencies installed
+Mock LLM mode returns the retrieved text directly, which makes tests easier. Without mock mode, tests would non deterministic. For automated CI, we need to be deterministic.
 
-The packages I installed are chromadb, fastapi, ollama, uvicorn. FastAPI is used for creating the server endpoints. Chroma is used for storing the knowldge base in the form of numeric sequences called vector embeddings from converting the input text. Uvicorn is used for serving the endpoints. Ollama is used for hosting and running the model locally..
+# Creating GitHub Actions Workflow
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_c9d0e1f2)
+I'm creating a GitHub Actions workflow file that will automate testing. The workflow automates testing by using the YAML file. When I push code, it will execute the tests on github servers.
 
-### Local API working
+## Workflow automation and CI testing
 
-I tested that my API works by runing a GET call against it. The local API responded with the right data. This confirms that data was ingested by the model from the knowledge base.
+I created the workflow file in .github/workflows. I pushed it using git add, git commit and git push.. Once on GitHub, the workflow will execute on changes to the k8s.txt, app.py and embed.py pushed into them.
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_v5w6x7y8)
+# Testing Data Quality
 
----
+I'm triggering the CI workflow by making changes to the k8s.txt. The workflow will test execute automatically. I expect it to fail because orchestration was removed.
 
-## Installing Docker Desktop
+## Data quality and CI protection
 
-### Docker Desktop setup
+The missing keyword was "orchestration". The semantic test failed because there was no orchestration. Without CI, this degraded content would have broken the prodtion when users would complain about it.
 
-Docker Desktop is a container creator/runner. I installed it because I want to create and run a container. Containerization will help my project by locking in the dependecies and make it usable across any docker application on another sytem.
+# Scaling with Multiple Documents
 
-### Docker verification
+I'm restructuring the project to handle real world scenarios where hundreds or thousands of documents will need to be stored. The new folder structure supports this process. This approach scales better because the RAG system can handle multiple knowledge documents.
 
-I verified Docker is working by installing the hello-world container image from docker. The hello-world container proves that all dependencies for docker as installed and I can proceed in working with docker and access all its functionality.
+## Docs folder structure and CI scaling
 
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_i9j0k1l2)
-
----
-
-## Creating the Dockerfile
-
-In this step, I'm building a RAG API. RAG stands for Retrival augmented generation. I'm creating files like dockerfile and build the docket image.
-
-### How the Dockerfile works
-
-A Dockerfile is the file used to build your image. The key instructions in my Dockerfile are adding the files/dependencies we want run to the image and create the image. FROM tells Docker to choose the base image. COPY is used for choose the files to be added to the image. RUN executes commands as pre compute commands and are added into the image and is ready to go when the image is loaded onto docker. CMD defines the post image start commands to be run when the image is loaded onto docker.
-
-### Containerized API test results
-
-Testing the API after containerization proved that we can containerize our api and have it connect to a host ollama. The difference between running locally and in Docker is all dependencies are within the image, works the same everywhere, isolated form host system. Containerization helps because it adds structure, standardization and portability to software
-
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_o1p2q3r4)
-
----
-
-## Building and Running the Container
-
-### Docker image build complete
-
-Building a Docker image involves making the core files. I verified my Docker image was built successfully by running "docker images | grep name". This confirms that my API is now containerized because there is an image created for it.
-
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_p9q0r1s2)
-
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_x7y8z9a0)
-
----
-
-## Pushing to Docker Hub
-
-In this project extension, I'm pushing to Docker Hub. Docker Hub is a cloud repository of images generater by the docker software. I'm doing this because I want to use the image on cloud providers and ci/cd pipeline integration.
-
-### Docker Hub push complete
-
-I pushed to Docker Hub by connecting to the docker hub with my  login. Docker Hub is useful because it aloows to share built images with the team. The advantage of pushing to a registry is it can be accessed from anywhere in the worls remotly and have it behave the same way constantly, therefore giveing it critical reliability.
-
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_m5n6o7p8)
-
-### Pulling from Docker Hub
-
-Pulling an image from Docker Hub means i am downloading the image. When I ran docker pull, Docker downloaded the image from the docket hub cloud. The difference between building locally and pulling from Docker Hub is the image build location is different.
-
-![Image](http://learn.nextwork.org/optimistic_rose_kind_soursop/uploads/ai-devops-docker_f5g6h7i8)
-
----
-
----
+The docs folder organizes files by moving all docs under docs/ folder. The embed\_docs.py script handles multiple .txt files under docs/ folder. CI validated all documents and found all the required test . This structure supports growth by allowing new docs to be added overtime.
